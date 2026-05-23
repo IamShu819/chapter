@@ -255,7 +255,7 @@
   /* Grid View */
   .book-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 120px));
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: var(--space-md);
   }
 
