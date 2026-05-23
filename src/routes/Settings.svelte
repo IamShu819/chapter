@@ -235,6 +235,11 @@
     transition: all var(--transition-fast);
   }
 
+  .theme-btn:not(.active):hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background: color-mix(in srgb, var(--accent) 4%, transparent);
+  }
+
   .theme-btn.active {
     border-color: var(--accent);
     color: var(--accent);
@@ -266,6 +271,11 @@
     background: var(--bg-secondary);
     border: 2px solid transparent;
     transition: all var(--transition-fast);
+  }
+
+  .font-btn:not(.active):hover {
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    background: color-mix(in srgb, var(--accent) 4%, transparent);
   }
 
   .font-btn.active {
@@ -314,6 +324,7 @@
   .preview-box {
     padding: var(--space-md);
     border-radius: var(--radius-md);
+    box-shadow: 0 2px 8px var(--shadow);
     transition: all var(--transition-normal);
   }
 

@@ -58,63 +58,78 @@ export function generateCoverImage(title: string, author?: string): Promise<Blob
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Subtle pattern overlay
-    ctx.globalAlpha = 0.08;
-    for (let i = 0; i < 6; i++) {
-      const cx = (hash * (i + 1) * 37) % W;
-      const cy = (hash * (i + 1) * 53) % H;
-      const r = 40 + (hash * (i + 1)) % 80;
+    // Subtle geometric pattern — diagonal lines
+    ctx.save();
+    ctx.globalAlpha = 0.06;
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    for (let i = -H; i < W + H; i += 18) {
       ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle = '#fff';
-      ctx.fill();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + H, H);
+      ctx.stroke();
     }
-    ctx.globalAlpha = 1;
+    ctx.restore();
 
-    // Border frame
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 2;
-    const margin = 16;
-    ctx.strokeRect(margin, margin, W - margin * 2, H - margin * 2);
+    // Book spine effect — left edge darkened strip
+    const spineW = 12;
+    const spineGrad = ctx.createLinearGradient(0, 0, spineW, 0);
+    spineGrad.addColorStop(0, 'rgba(0,0,0,0.25)');
+    spineGrad.addColorStop(0.6, 'rgba(0,0,0,0.08)');
+    spineGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = spineGrad;
+    ctx.fillRect(0, 0, spineW, H);
+
+    // Inner border — double line for elegance
+    const m = 20;
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(m, m, W - m * 2, H - m * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.strokeRect(m + 4, m + 4, W - (m + 4) * 2, H - (m + 4) * 2);
 
     // Title text
     const cleanTitle = title.replace(/\.[^.]+$/, '').trim();
-    const lines = breakText(ctx, cleanTitle, W - 60, 'bold 32px serif');
+    const maxTextW = W - 70;
+    const lines = breakText(ctx, cleanTitle, maxTextW, 'bold 32px serif');
+
+    const titleSize = lines.length > 2 ? 28 : 34;
+    const lineHeight = titleSize + 10;
+    const totalTextH = lines.length * lineHeight;
+    const hasAuthor = author && author !== '未知';
+    const startY = H / 2 - totalTextH / 2 + (hasAuthor ? -20 : 0);
+
+    // Text shadow
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 2;
 
     ctx.fillStyle = 'rgba(255,255,255,0.95)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const lineHeight = 42;
-    const totalTextH = lines.length * lineHeight;
-    const startY = H / 2 - totalTextH / 2 + (author ? -16 : 0);
-
-    // Text shadow
-    ctx.shadowColor = 'rgba(0,0,0,0.3)';
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetX = 1;
-    ctx.shadowOffsetY = 2;
-
     lines.forEach((line, i) => {
-      ctx.font = lines.length > 2 ? 'bold 28px serif' : 'bold 34px serif';
+      ctx.font = `bold ${titleSize}px serif`;
       ctx.fillText(line, W / 2, startY + i * lineHeight);
     });
 
     // Author
     ctx.shadowBlur = 0;
-    if (author && author !== '未知') {
-      ctx.font = '16px sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,0.65)';
-      ctx.fillText(author, W / 2, startY + lines.length * lineHeight + 16);
+    if (hasAuthor) {
+      ctx.font = '15px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText(author!, W / 2, startY + lines.length * lineHeight + 18);
     }
 
-    // Bottom decoration line
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(W / 2 - 30, H - 50);
-    ctx.lineTo(W / 2 + 30, H - 50);
-    ctx.stroke();
+    // Bottom decorative element — small diamond
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    const dy = H - 48;
+    ctx.save();
+    ctx.translate(W / 2, dy);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-4, -4, 8, 8);
+    ctx.restore();
 
     canvas.toBlob((blob) => {
       if (blob) resolve(blob);

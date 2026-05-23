@@ -40,10 +40,10 @@
   }
 
   function toneColor(pinyin: string): string {
-    if (pinyin.includes('ā') || pinyin.includes('ē') || pinyin.includes('ī') || pinyin.includes('ō') || pinyin.includes('ū') || pinyin.includes('ǖ') || pinyin.includes('ˉ')) return '#E74C3C';
-    if (pinyin.includes('á') || pinyin.includes('é') || pinyin.includes('í') || pinyin.includes('ó') || pinyin.includes('ú') || pinyin.includes('ǘ') || pinyin.includes('ˊ')) return '#F39C12';
-    if (pinyin.includes('ǎ') || pinyin.includes('ě') || pinyin.includes('ǐ') || pinyin.includes('ǒ') || pinyin.includes('ǔ') || pinyin.includes('ǚ') || pinyin.includes('ˇ')) return '#27AE60';
-    if (pinyin.includes('à') || pinyin.includes('è') || pinyin.includes('ì') || pinyin.includes('ò') || pinyin.includes('ù') || pinyin.includes('ǜ') || pinyin.includes('ˋ')) return '#2980B9';
+    if (pinyin.includes('ā') || pinyin.includes('ē') || pinyin.includes('ī') || pinyin.includes('ō') || pinyin.includes('ū') || pinyin.includes('ǖ') || pinyin.includes('ˉ')) return 'var(--tone-1)';
+    if (pinyin.includes('á') || pinyin.includes('é') || pinyin.includes('í') || pinyin.includes('ó') || pinyin.includes('ú') || pinyin.includes('ǘ') || pinyin.includes('ˊ')) return 'var(--tone-2)';
+    if (pinyin.includes('ǎ') || pinyin.includes('ě') || pinyin.includes('ǐ') || pinyin.includes('ǒ') || pinyin.includes('ǔ') || pinyin.includes('ǚ') || pinyin.includes('ˇ')) return 'var(--tone-3)';
+    if (pinyin.includes('à') || pinyin.includes('è') || pinyin.includes('ì') || pinyin.includes('ò') || pinyin.includes('ù') || pinyin.includes('ǜ') || pinyin.includes('ˋ')) return 'var(--tone-4)';
     return 'var(--text-secondary)';
   }
 
@@ -143,8 +143,8 @@
   .dict-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
+    gap: var(--space-sm-md);
+    padding: 14px var(--space-md);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
@@ -163,8 +163,8 @@
 
   .dict-save {
     margin-left: auto;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -175,17 +175,17 @@
 
   .dict-save:hover {
     background: var(--bg-secondary);
-    color: #E74C3C;
+    color: var(--danger);
   }
 
   .dict-save.saved {
-    color: #E74C3C;
+    color: var(--danger);
   }
 
   .dict-close {
     margin-left: auto;
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -200,13 +200,13 @@
   }
 
   .dict-body {
-    padding: 12px 16px;
+    padding: var(--space-sm-md) var(--space-md);
     overflow-y: auto;
   }
 
   .dict-empty {
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: var(--font-size-body);
     text-align: center;
     padding: 16px;
   }
@@ -225,7 +225,7 @@
 
   .dict-badge {
     display: inline-block;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--accent);
     background: color-mix(in srgb, var(--accent) 12%, transparent);
     padding: 1px 6px;
@@ -235,7 +235,7 @@
   }
 
   .dict-def {
-    font-size: 14px;
+    font-size: var(--font-size-body);
     line-height: 1.6;
     color: var(--text-primary);
   }
@@ -252,14 +252,14 @@
   :global(.dict-source) {
     color: var(--accent);
     font-weight: 500;
-    font-size: 13px;
+    font-size: var(--font-size-body);
   }
 
   .examples-toggle {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 13px;
+    font-size: var(--font-size-body);
     color: var(--accent);
     padding: 6px 0;
     width: 100%;
@@ -267,7 +267,7 @@
   }
 
   .toggle-arrow {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     transition: transform var(--transition-fast);
   }
 
@@ -295,7 +295,7 @@
   }
 
   .example-tr {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--text-muted);
     margin-top: 2px;
   }

@@ -37,7 +37,10 @@
   .bottom-tabs {
     display: flex;
     border-top: 1px solid var(--border);
-    background: var(--bg-card);
+    background: color-mix(in srgb, var(--bg-card) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -1px 8px rgba(0,0,0,0.06);
     padding-bottom: var(--safe-bottom);
     height: var(--tab-height);
     flex-shrink: 0;
@@ -52,12 +55,30 @@
     justify-content: center;
     gap: 4px;
     color: var(--text-muted);
-    transition: color var(--transition-fast);
+    transition: color var(--transition-fast), background var(--transition-fast);
     -webkit-tap-highlight-color: transparent;
+    position: relative;
+    border-radius: var(--radius-sm);
+  }
+
+  .tab:not(.active):hover {
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
   }
 
   .tab.active {
     color: var(--accent);
+  }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent);
   }
 
   .tab-icon {

@@ -236,6 +236,11 @@
     color: var(--danger);
   }
 
+  .message.info {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+  }
+
   /* Formats */
   .formats, .tips {
     margin-top: var(--space-lg);

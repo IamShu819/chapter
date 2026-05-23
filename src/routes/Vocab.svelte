@@ -195,11 +195,11 @@
   }
 
   .vocab-header {
-    padding: 16px 20px 12px;
-    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    padding: var(--space-md) 20px var(--space-sm-md);
+    padding-top: calc(var(--space-md) + env(safe-area-inset-top, 0px));
     display: flex;
     align-items: baseline;
-    gap: 12px;
+    gap: var(--space-sm-md);
     flex-shrink: 0;
   }
 
@@ -210,24 +210,24 @@
   }
 
   .vocab-count {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     color: var(--text-muted);
   }
 
   .review-start-btn {
     margin-left: auto;
-    padding: 6px 16px;
+    padding: 6px var(--space-md);
     border-radius: var(--radius-md);
     background: var(--accent);
     color: white;
-    font-size: 13px;
+    font-size: var(--font-size-body);
     font-weight: 600;
   }
 
   .vocab-list {
     flex: 1;
     overflow-y: auto;
-    padding: 0 16px 16px;
+    padding: 0 var(--space-md) var(--space-md);
   }
 
   .vocab-empty {
@@ -243,25 +243,26 @@
   .empty-icon {
     font-size: 40px;
     margin-bottom: 12px;
+    animation: float 3s ease-in-out infinite;
   }
 
   .empty-hint {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     margin-top: 4px;
   }
 
   .vocab-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 0;
+    gap: var(--space-sm-md);
+    padding: var(--space-sm-md) 0;
     border-bottom: 1px solid var(--border);
   }
 
   .vocab-main {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: var(--space-sm-md);
     flex: 1;
     min-width: 0;
   }
@@ -285,25 +286,25 @@
   }
 
   .vocab-pinyin {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     color: var(--text-secondary);
   }
 
   .vocab-def {
-    font-size: 14px;
+    font-size: var(--font-size-body);
     color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .vocab-meta {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--text-muted);
   }
 
   .vocab-delete {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -315,7 +316,7 @@
 
   .vocab-delete:hover {
     background: var(--bg-secondary);
-    color: #E74C3C;
+    color: var(--danger);
   }
 
   .vocab-delete svg {
@@ -338,16 +339,16 @@
   .review-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    gap: var(--space-sm-md);
+    padding: var(--space-sm-md) var(--space-md);
+    padding-top: calc(var(--space-sm-md) + env(safe-area-inset-top, 0px));
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
 
   .review-back {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -363,7 +364,7 @@
 
   .review-stats {
     margin-left: auto;
-    font-size: 13px;
+    font-size: var(--font-size-body);
     color: var(--text-muted);
   }
 
@@ -425,7 +426,7 @@
   }
 
   .card-hint {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--text-muted);
   }
 
@@ -443,9 +444,9 @@
 
   .review-actions {
     display: flex;
-    gap: 12px;
-    padding: 16px 24px;
-    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    gap: var(--space-sm-md);
+    padding: var(--space-md) var(--space-lg);
+    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
     flex-shrink: 0;
   }
 
@@ -467,13 +468,13 @@
   }
 
   .review-btn.unknown {
-    background: color-mix(in srgb, #E74C3C 12%, transparent);
-    color: #E74C3C;
+    background: color-mix(in srgb, var(--danger) 12%, transparent);
+    color: var(--danger);
   }
 
   .review-btn.known {
-    background: color-mix(in srgb, #27AE60 12%, transparent);
-    color: #27AE60;
+    background: color-mix(in srgb, var(--success) 12%, transparent);
+    color: var(--success);
   }
 
   .btn-icon {
@@ -519,12 +520,12 @@
     font-weight: 700;
   }
 
-  .stat.known .stat-num { color: #27AE60; }
-  .stat.unknown .stat-num { color: #E74C3C; }
+  .stat.known .stat-num { color: var(--success); }
+  .stat.unknown .stat-num { color: var(--danger); }
   .stat.total .stat-num { color: var(--text-primary); }
 
   .stat-label {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     color: var(--text-muted);
   }
 
@@ -538,12 +539,4 @@
     font-weight: 600;
   }
 
-  .fade-in {
-    animation: fadeIn 0.25s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
 </style>

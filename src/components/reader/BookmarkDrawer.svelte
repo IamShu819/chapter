@@ -93,7 +93,7 @@
   }
 
   .drawer-count {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--text-muted);
     background: var(--bg-secondary);
     padding: 1px 8px;
@@ -102,8 +102,8 @@
 
   .drawer-close {
     margin-left: auto;
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -134,7 +134,7 @@
   }
 
   .empty-hint {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     margin-top: 4px;
   }
 
@@ -152,14 +152,14 @@
   }
 
   .bookmark-chapter {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--accent);
     font-weight: 600;
     margin-bottom: 4px;
   }
 
   .bookmark-text {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     color: var(--text-primary);
     line-height: 1.5;
     overflow: hidden;
@@ -171,14 +171,14 @@
   }
 
   .bookmark-time {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--text-muted);
     margin-top: 4px;
   }
 
   .bookmark-delete {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -191,7 +191,7 @@
 
   .bookmark-delete:hover {
     background: var(--bg-secondary);
-    color: #E74C3C;
+    color: var(--danger);
   }
 
   .bookmark-delete svg {
@@ -203,12 +203,4 @@
     stroke-linecap: round;
   }
 
-  .slide-in-right {
-    animation: slideInRight 0.25s ease-out;
-  }
-
-  @keyframes slideInRight {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-  }
 </style>

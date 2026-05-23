@@ -99,6 +99,7 @@
     {:else if viewMode === 'grid'}
       <div class="book-grid">
         {#each filteredBooks as book (book.id)}
+          {@const pct = getProgress(book.id)}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="book-card" onclick={() => openBook(book)} onkeydown={(e) => e.key === 'Enter' && openBook(book)} role="button" tabindex="0">
             <div class="book-cover" style="background: {book.coverGradient}">
@@ -111,9 +112,9 @@
               {:else}
                 <span class="cover-title">{book.title.slice(0, 2)}</span>
               {/if}
-              {#if getProgress(book.id) > 0}
+              {#if pct > 0}
                 <div class="progress-badge">
-                  {Math.round(getProgress(book.id) * 100)}%
+                  {Math.round(pct * 100)}%
                 </div>
               {/if}
             </div>
@@ -128,6 +129,7 @@
     {:else}
       <div class="book-list">
         {#each filteredBooks as book (book.id)}
+          {@const pct = getProgress(book.id)}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div class="book-row" onclick={() => openBook(book)} onkeydown={(e) => e.key === 'Enter' && openBook(book)} role="button" tabindex="0">
             <div class="row-cover" style="background: {book.coverGradient}">
@@ -141,8 +143,8 @@
               <p class="row-title">{book.title}</p>
               <p class="row-meta">{book.author} · {formatFileSize(book.fileSize)} · {book.format.toUpperCase()}</p>
             </div>
-            {#if getProgress(book.id) > 0}
-              <span class="row-progress">{Math.round(getProgress(book.id) * 100)}%</span>
+            {#if pct > 0}
+              <span class="row-progress">{Math.round(pct * 100)}%</span>
             {/if}
             <button class="delete-btn-row" onclick={(e) => deleteBook(e, book)}>✕</button>
           </div>
@@ -201,8 +203,8 @@
   }
 
   .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -242,14 +244,18 @@
 
   .clear-btn {
     color: var(--text-muted);
-    font-size: 14px;
-    padding: 4px;
+    font-size: var(--font-size-body);
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Grid View */
   .book-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: var(--space-md);
   }
 
@@ -269,11 +275,15 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    box-shadow: 0 2px 8px var(--shadow);
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
   }
 
-  .book-card:hover .book-cover,
+  .book-card:hover .book-cover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-elevated);
+  }
+
   .book-card:active .book-cover {
     transform: scale(0.97);
     box-shadow: 0 1px 4px var(--shadow);
@@ -306,7 +316,7 @@
     right: 6px;
     background: rgba(0,0,0,0.6);
     color: white;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     padding: 2px 6px;
     border-radius: 10px;
     backdrop-filter: blur(4px);
@@ -328,7 +338,7 @@
   }
 
   .book-author {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--text-muted);
     margin-top: 2px;
     display: -webkit-box;
@@ -340,10 +350,10 @@
 
   .delete-btn {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 24px;
-    height: 24px;
+    top: 0;
+    right: 0;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: rgba(0,0,0,0.5);
     color: white;
@@ -407,21 +417,21 @@
   }
 
   .row-meta {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--text-muted);
     margin-top: 4px;
   }
 
   .row-progress {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--accent);
     font-weight: 600;
     flex-shrink: 0;
   }
 
   .delete-btn-row {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -450,6 +460,7 @@
     font-size: 64px;
     margin-bottom: var(--space-md);
     opacity: 0.6;
+    animation: float 3s ease-in-out infinite;
   }
 
   .empty-text {

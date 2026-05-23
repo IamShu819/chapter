@@ -93,7 +93,7 @@
   }
 
   .drawer-count {
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--text-muted);
     background: var(--bg-secondary);
     padding: 1px 8px;
@@ -102,8 +102,8 @@
 
   .drawer-close {
     margin-left: auto;
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -134,7 +134,7 @@
   }
 
   .empty-hint {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     margin-top: 4px;
   }
 
@@ -152,7 +152,7 @@
   }
 
   .annotation-quote {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     color: var(--text-secondary);
     font-family: var(--font-serif);
     line-height: 1.5;
@@ -167,7 +167,7 @@
   }
 
   .annotation-note {
-    font-size: 14px;
+    font-size: var(--font-size-body);
     color: var(--text-primary);
     line-height: 1.5;
     overflow: hidden;
@@ -178,14 +178,14 @@
   }
 
   .annotation-meta {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--text-muted);
     margin-top: 4px;
   }
 
   .annotation-delete {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -199,7 +199,7 @@
 
   .annotation-delete:hover {
     background: var(--bg-secondary);
-    color: #E74C3C;
+    color: var(--danger);
   }
 
   .annotation-delete svg {
@@ -211,12 +211,4 @@
     stroke-linecap: round;
   }
 
-  .slide-in-right {
-    animation: slideInRight 0.25s ease-out;
-  }
-
-  @keyframes slideInRight {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-  }
 </style>

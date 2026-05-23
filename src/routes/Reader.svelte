@@ -115,6 +115,7 @@
     scrollTimers.forEach(clearTimeout);
     scrollTimers = [];
     if (scrollRaf !== null) cancelAnimationFrame(scrollRaf);
+    progressStore.dispose();
   });
 
   async function loadContent() {
@@ -325,7 +326,7 @@
     let hasImages = false;
     for (let i = ch.startOffset; i < ch.endOffset; i++) {
       const page = await doc.getPage(i + 1);
-      html += `<div class="pdf-page" data-page="${i + 1}"><p class="pdf-page-num">— 第 ${i + 1} 页 —<button class="pdf-note-btn" data-add-note="${i + 1}" title="添加笔记">📝</button></p>`;
+      html += `<div class="pdf-page" data-page="${i + 1}"><p class="pdf-page-num">— 第 ${i + 1} 页 —<button class="pdf-note-btn" data-add-note="${i + 1}" title="添加笔记"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button></p>`;
 
       // Try text extraction with layout reconstruction
       const content = await page.getTextContent({ normalizeWhitespace: true } as any);
@@ -1369,7 +1370,7 @@
   }
 
   .back-btn {
-    width: 40px; height: 40px;
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
@@ -1384,7 +1385,7 @@
   }
 
   .action-btn {
-    width: 36px; height: 36px;
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
@@ -1401,9 +1402,9 @@
   }
 
   .font-btn {
-    font-size: 13px;
+    font-size: var(--font-size-body);
     font-weight: 700;
-    width: 32px;
+    width: 44px;
   }
 
   .reader-title { flex: 1; text-align: center; min-width: 0; padding: 0 8px; }
@@ -1438,8 +1439,8 @@
   .text-content :global(img) { max-width: 100%; height: auto; display: block; margin: 1em auto; }
   .text-content :global(.pdf-page) { margin-bottom: 2em; padding-bottom: 1em; border-bottom: 1px dashed var(--border); }
   .text-content :global(.pdf-page-num) { text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 1em; text-indent: 0; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .text-content :global(.pdf-note-btn) { background: none; border: none; font-size: 14px; cursor: pointer; padding: 2px 4px; opacity: 0.6; transition: opacity 0.2s; }
-  .text-content :global(.pdf-note-btn:hover) { opacity: 1; }
+  .text-content :global(.pdf-note-btn) { background: none; border: none; cursor: pointer; padding: 2px 4px; opacity: 0.5; transition: opacity var(--transition-fast), color var(--transition-fast); color: var(--text-muted); display: inline-flex; align-items: center; vertical-align: middle; }
+  .text-content :global(.pdf-note-btn:hover) { opacity: 1; color: var(--accent); }
   .text-content :global(.pdf-canvas-page) { width: 100%; height: auto; display: block; border: 1px solid var(--border); border-radius: var(--radius-sm); }
 
   .text-content.zoomed :global(.pdf-canvas-page) { max-width: none; width: 100%; }
@@ -1545,8 +1546,8 @@
   }
 
   .search-nav-btn {
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1584,8 +1585,8 @@
   }
 
   .search-close-btn {
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1677,8 +1678,8 @@
   }
 
   .note-close {
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1762,11 +1763,11 @@
   }
 
   .note-delete {
-    color: #E74C3C;
+    color: var(--danger);
   }
 
   .note-delete:hover {
-    background: color-mix(in srgb, #E74C3C 10%, transparent);
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
   }
 
   .edit-book-btn {
