@@ -168,12 +168,17 @@ class BookStore {
   }
 
   async updateBook(id: string, data: { title?: string; author?: string }) {
-    await db.books.update(id, data);
     const book = this.books.find(b => b.id === id);
-    if (book) {
-      if (data.title !== undefined) book.title = data.title;
-      if (data.author !== undefined) book.author = data.author;
+    if (!book) return;
+    if (data.title !== undefined) book.title = data.title;
+    if (data.author !== undefined) book.author = data.author;
+    // Regenerate cover with new title/author
+    try {
+      book.coverBlob = await generateCoverImage(book.title, book.author);
+    } catch (e) {
+      console.warn('Cover regeneration failed:', e);
     }
+    await db.books.update(id, { ...data, coverBlob: book.coverBlob });
   }
 
   async updateLastRead(id: string) {
