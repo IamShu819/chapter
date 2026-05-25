@@ -47,46 +47,67 @@ export function generateCoverImage(title: string, author?: string): Promise<Blob
     const [c1, c2] = PALETTES[hash % PALETTES.length];
     const angle = ((hash % 8) * 45) * Math.PI / 180;
 
-    // Gradient background
+    // Gradient background — 3-stop for richer depth
     const x1 = W / 2 - Math.cos(angle) * W;
     const y1 = H / 2 - Math.sin(angle) * H;
     const x2 = W / 2 + Math.cos(angle) * W;
     const y2 = H / 2 + Math.sin(angle) * H;
     const grad = ctx.createLinearGradient(x1, y1, x2, y2);
     grad.addColorStop(0, c1);
+    grad.addColorStop(0.5, lerpColor(c1, c2, 0.4));
     grad.addColorStop(1, c2);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Subtle geometric pattern — diagonal lines
+    // Paper grain texture — subtle noise
+    const imgData = ctx.getImageData(0, 0, W, H);
+    const d = imgData.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const noise = (Math.random() - 0.5) * 12;
+      d[i] = Math.min(255, Math.max(0, d[i] + noise));
+      d[i + 1] = Math.min(255, Math.max(0, d[i + 1] + noise));
+      d[i + 2] = Math.min(255, Math.max(0, d[i + 2] + noise));
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // Subtle fabric-like crosshatch texture
     ctx.save();
-    ctx.globalAlpha = 0.06;
+    ctx.globalAlpha = 0.03;
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1;
-    for (let i = -H; i < W + H; i += 18) {
+    ctx.lineWidth = 0.5;
+    for (let i = -H; i < W + H; i += 14) {
       ctx.beginPath();
       ctx.moveTo(i, 0);
       ctx.lineTo(i + H, H);
       ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(i + H, 0);
+      ctx.lineTo(i, H);
+      ctx.stroke();
     }
     ctx.restore();
 
-    // Book spine effect — left edge darkened strip
-    const spineW = 12;
+    // Book spine effect — left edge shadow
+    const spineW = 14;
     const spineGrad = ctx.createLinearGradient(0, 0, spineW, 0);
-    spineGrad.addColorStop(0, 'rgba(0,0,0,0.25)');
-    spineGrad.addColorStop(0.6, 'rgba(0,0,0,0.08)');
+    spineGrad.addColorStop(0, 'rgba(0,0,0,0.3)');
+    spineGrad.addColorStop(0.5, 'rgba(0,0,0,0.08)');
     spineGrad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = spineGrad;
     ctx.fillRect(0, 0, spineW, H);
 
-    // Inner border — double line for elegance
-    const m = 20;
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    // Vignette — radial darkening at corners
+    const vigGrad = ctx.createRadialGradient(W / 2, H / 2, W * 0.35, W / 2, H / 2, W * 0.85);
+    vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    vigGrad.addColorStop(1, 'rgba(0,0,0,0.2)');
+    ctx.fillStyle = vigGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Inner border — single subtle line
+    const m = 22;
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
     ctx.lineWidth = 1;
     ctx.strokeRect(m, m, W - m * 2, H - m * 2);
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-    ctx.strokeRect(m + 4, m + 4, W - (m + 4) * 2, H - (m + 4) * 2);
 
     // Title text
     const cleanTitle = title.replace(/\.[^.]+$/, '').trim();
@@ -100,8 +121,8 @@ export function generateCoverImage(title: string, author?: string): Promise<Blob
     const startY = H / 2 - totalTextH / 2 + (hasAuthor ? -20 : 0);
 
     // Text shadow
-    ctx.shadowColor = 'rgba(0,0,0,0.35)';
-    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur = 10;
     ctx.shadowOffsetX = 1;
     ctx.shadowOffsetY = 2;
 
@@ -118,12 +139,12 @@ export function generateCoverImage(title: string, author?: string): Promise<Blob
     ctx.shadowBlur = 0;
     if (hasAuthor) {
       ctx.font = '15px sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
       ctx.fillText(author!, W / 2, startY + lines.length * lineHeight + 18);
     }
 
     // Bottom decorative element — small diamond
-    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
     const dy = H - 48;
     ctx.save();
     ctx.translate(W / 2, dy);
@@ -169,6 +190,17 @@ function breakText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
   }
 
   return lines;
+}
+
+function lerpColor(a: string, b: string, t: number): string {
+  const ah = parseInt(a.slice(1), 16);
+  const bh = parseInt(b.slice(1), 16);
+  const ar = (ah >> 16) & 0xff, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
+  const br = (bh >> 16) & 0xff, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
+  const rr = Math.round(ar + (br - ar) * t);
+  const rg = Math.round(ag + (bg - ag) * t);
+  const rb = Math.round(ab + (bb - ab) * t);
+  return `#${((rr << 16) | (rg << 8) | rb).toString(16).padStart(6, '0')}`;
 }
 
 export function formatFileSize(bytes: number): string {

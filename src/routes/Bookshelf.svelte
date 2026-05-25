@@ -4,14 +4,14 @@
   import type { Book } from '../lib/types/book';
 
   // Object URL cache for cover images
-  const coverUrlCache = new Map<string, string>();
+  const coverUrlCache = new Map<string, { url: string; blob: Blob }>();
 
   function getCoverUrl(blob: Blob, id: string): string {
-    let url = coverUrlCache.get(id);
-    if (!url) {
-      url = URL.createObjectURL(blob);
-      coverUrlCache.set(id, url);
-    }
+    const cached = coverUrlCache.get(id);
+    if (cached && cached.blob === blob) return cached.url;
+    if (cached) URL.revokeObjectURL(cached.url);
+    const url = URL.createObjectURL(blob);
+    coverUrlCache.set(id, { url, blob });
     return url;
   }
 
@@ -255,7 +255,7 @@
   /* Grid View */
   .book-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-md);
   }
 
@@ -265,12 +265,16 @@
     flex-direction: column;
     text-align: left;
     -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    min-width: 0;
   }
 
   .book-cover {
+    width: 100%;
     aspect-ratio: 3/4;
     border-radius: var(--radius-md);
     overflow: hidden;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -293,6 +297,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
 
   .cover-title {

@@ -41,6 +41,8 @@
   let showEditBook = $state(false);
   let editTitle = $state('');
   let editAuthor = $state('');
+  let editTitleInput = $state<HTMLInputElement | null>(null);
+  let editAuthorInput = $state<HTMLInputElement | null>(null);
   let pdfZoom = $state(1);
   let pdfHasImages = $state(false);
   let pinchStartDist = 0;
@@ -243,14 +245,23 @@
       : new File([book.fileBlob], `${book.title}.epub`, { type: 'application/epub+zip' });
     const epub = await parseEpub(epubFile, { chapterIndex: currentChapter });
 
-    // Update metadata if we got better info
+    // Update metadata from epub if user hasn't manually renamed
+    // Check if book title was previously set from epub metadata
     if (epub.title && epub.title !== book.title) {
-      book.title = epub.title;
-      await db.books.update(book.id, { title: epub.title });
+      const savedBook = await db.books.get(book.id);
+      // Only auto-update if the saved title still matches the epub metadata
+      // (i.e. user hasn't renamed it)
+      if (savedBook && savedBook.title === epub.title) {
+        book.title = epub.title;
+        await db.books.update(book.id, { title: epub.title });
+      }
     }
     if (epub.author && epub.author !== book.author) {
-      book.author = epub.author;
-      await db.books.update(book.id, { author: epub.author });
+      const savedBook = await db.books.get(book.id);
+      if (savedBook && savedBook.author === epub.author) {
+        book.author = epub.author;
+        await db.books.update(book.id, { author: epub.author });
+      }
     }
 
     // Update chapters from parsed TOC
@@ -920,15 +931,29 @@
     showEditBook = true;
   }
 
-  function saveBookInfo() {
+  async function saveBookInfo() {
     if (!book) return;
-    const title = editTitle.trim();
-    const author = editAuthor.trim();
+    // Read directly from DOM — avoids CJK composition issue with bind:value
+    const title = (editTitleInput?.value ?? editTitle).trim();
+    const author = (editAuthorInput?.value ?? editAuthor).trim();
     if (!title) return;
-    void bookStore.updateBook(book.id, { title, author });
-    book.title = title;
-    book.author = author;
-    showEditBook = false;
+    try {
+      const newGradient = title !== book.title ? generateCoverGradient(title) : book.coverGradient;
+      let newCoverBlob = book.coverBlob;
+      try { newCoverBlob = await generateCoverImage(title, author); } catch {}
+
+      await db.books.update(book.id, { title, author, coverGradient: newGradient, coverBlob: newCoverBlob });
+
+      book = { ...book, title, author, coverGradient: newGradient, coverBlob: newCoverBlob };
+      const idx = bookStore.books.findIndex(b => b.id === book!.id);
+      if (idx !== -1) {
+        bookStore.books = bookStore.books.map((b, i) => i === idx ? book! : b);
+      }
+      showEditBook = false;
+    } catch (e: any) {
+      console.error('saveBookInfo failed:', e);
+      alert('保存失败: ' + (e.message || e));
+    }
   }
 
   // ===== Search =====
@@ -1028,6 +1053,7 @@
 
   // Need db import for epub metadata update
   import { db } from '../lib/db';
+  import { generateCoverGradient, generateCoverImage } from '../lib/utils/cover';
 </script>
 
 <div class="reader">
@@ -1242,9 +1268,9 @@
     <!-- Note input popup -->
     {#if notePopup}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div class="note-overlay" onclick={() => notePopup = null} onkeydown={(e) => e.key === 'Escape' && (notePopup = null)} role="button" tabindex="-1">
+      <div class="note-overlay" onclick={(e) => { if (!(e.target as HTMLElement).closest('.note-popup')) notePopup = null; }} onkeydown={(e) => e.key === 'Escape' && (notePopup = null)} role="button" tabindex="-1">
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="note-popup fade-in" onclick={(e) => e.stopPropagation()} onkeydown={() => {}} role="dialog" tabindex="-1">
+        <div class="note-popup fade-in" onclick={(e) => e.stopPropagation()} onpointerdown={(e) => e.stopPropagation()} onkeydown={() => {}} role="dialog" tabindex="-1">
           <div class="note-header">
             <h3>{notePopup.editingId ? '编辑批注' : '添加批注'}</h3>
             <button class="note-close" onclick={() => notePopup = null}>✕</button>
@@ -1268,9 +1294,9 @@
     <!-- View annotation popup -->
     {#if viewingAnnotation}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div class="note-overlay" onclick={() => viewingAnnotation = null} onkeydown={(e) => e.key === 'Escape' && (viewingAnnotation = null)} role="button" tabindex="-1">
+      <div class="note-overlay" onclick={(e) => { if (!(e.target as HTMLElement).closest('.note-popup')) viewingAnnotation = null; }} onkeydown={(e) => e.key === 'Escape' && (viewingAnnotation = null)} role="button" tabindex="-1">
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="note-popup fade-in" onclick={(e) => e.stopPropagation()} onkeydown={() => {}} role="dialog" tabindex="-1">
+        <div class="note-popup fade-in" onclick={(e) => e.stopPropagation()} onpointerdown={(e) => e.stopPropagation()} onkeydown={() => {}} role="dialog" tabindex="-1">
           <div class="note-header">
             <h3>批注</h3>
             <button class="note-close" onclick={() => viewingAnnotation = null}>✕</button>
@@ -1288,20 +1314,20 @@
     <!-- Edit book info popup -->
     {#if showEditBook}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div class="note-overlay" onclick={() => showEditBook = false} onkeydown={(e) => e.key === 'Escape' && (showEditBook = false)} role="button" tabindex="-1">
+      <div class="note-overlay" onclick={(e) => { if (!(e.target as HTMLElement).closest('.note-popup')) showEditBook = false; }} onkeydown={(e) => e.key === 'Escape' && (showEditBook = false)} role="button" tabindex="-1">
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="note-popup fade-in" onclick={(e) => e.stopPropagation()} onkeydown={() => {}} role="dialog" tabindex="-1">
+        <div class="note-popup fade-in" onclick={(e) => e.stopPropagation()} onpointerdown={(e) => e.stopPropagation()} onkeydown={() => {}} role="dialog" tabindex="-1">
           <div class="note-header">
             <h3>编辑书籍信息</h3>
             <button class="note-close" onclick={() => showEditBook = false}>✕</button>
           </div>
           <label class="edit-label">
             书名
-            <input class="edit-input" type="text" bind:value={editTitle} placeholder="书名" />
+            <input class="edit-input" type="text" bind:this={editTitleInput} bind:value={editTitle} placeholder="书名" />
           </label>
           <label class="edit-label">
             作者
-            <input class="edit-input" type="text" bind:value={editAuthor} placeholder="作者" />
+            <input class="edit-input" type="text" bind:this={editAuthorInput} bind:value={editAuthor} placeholder="作者" />
           </label>
           <div class="note-actions">
             <button class="note-cancel" onclick={() => showEditBook = false}>取消</button>
@@ -1381,7 +1407,17 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .reader-actions::-webkit-scrollbar { display: none; }
+
+  @media (max-width: 420px) {
+    .font-btn { display: none; }
   }
 
   .action-btn {

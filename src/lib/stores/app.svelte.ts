@@ -168,17 +168,35 @@ class BookStore {
   }
 
   async updateBook(id: string, data: { title?: string; author?: string }) {
-    const book = this.books.find(b => b.id === id);
-    if (!book) return;
-    if (data.title !== undefined) book.title = data.title;
-    if (data.author !== undefined) book.author = data.author;
-    // Regenerate cover with new title/author
+    const idx = this.books.findIndex(b => b.id === id);
+    if (idx === -1) return;
+    const old = this.books[idx];
+    const newTitle = data.title !== undefined ? data.title : old.title;
+    const newAuthor = data.author !== undefined ? data.author : old.author;
+    const newGradient = data.title !== undefined ? generateCoverGradient(newTitle) : old.coverGradient;
+    let newCoverBlob = old.coverBlob;
     try {
-      book.coverBlob = await generateCoverImage(book.title, book.author);
+      newCoverBlob = await generateCoverImage(newTitle, newAuthor);
     } catch (e) {
       console.warn('Cover regeneration failed:', e);
     }
-    await db.books.update(id, { ...data, coverBlob: book.coverBlob });
+    await db.books.update(id, { title: newTitle, author: newAuthor, coverGradient: newGradient, coverBlob: newCoverBlob });
+    // Build a fresh object to ensure Svelte 5 reactivity detects the change
+    const updated: Book = {
+      id: old.id,
+      title: newTitle,
+      author: newAuthor,
+      format: old.format,
+      coverGradient: newGradient,
+      coverBlob: newCoverBlob,
+      fileBlob: old.fileBlob,
+      fileSize: old.fileSize,
+      addedAt: old.addedAt,
+      lastReadAt: old.lastReadAt,
+      metadata: old.metadata,
+      chapters: old.chapters,
+    };
+    this.books = this.books.map((b, i) => i === idx ? updated : b);
   }
 
   async updateLastRead(id: string) {

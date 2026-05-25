@@ -95,12 +95,17 @@
         </svg>
       </button>
       <span class="review-progress">{currentIndex + (reviewDone ? 0 : 1)} / {reviewCards.length}</span>
-      <span class="review-stats">✓ {knownCount} · ✗ {unknownCount}</span>
+      <span class="review-stats">
+        <svg class="stat-icon known-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>{knownCount}
+        <svg class="stat-icon unknown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>{unknownCount}
+      </span>
     </header>
 
     {#if reviewDone}
       <div class="review-result">
-        <div class="result-icon">📝</div>
+        <div class="result-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
         <h2>复习完成</h2>
         <div class="result-stats">
           <div class="stat known">
@@ -137,10 +142,12 @@
       {#if flipped}
         <div class="review-actions fade-in">
           <button class="review-btn unknown" onclick={answerUnknown}>
-            <span class="btn-icon">✗</span> 不认识
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+            不认识
           </button>
           <button class="review-btn known" onclick={answerKnown}>
-            <span class="btn-icon">✓</span> 认识
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            认识
           </button>
         </div>
       {/if}
@@ -191,7 +198,8 @@
   .vocab-page {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
   }
 
   .vocab-header {
@@ -332,7 +340,8 @@
   .review-page {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     background: var(--bg-primary);
   }
 
@@ -366,7 +375,18 @@
     margin-left: auto;
     font-size: var(--font-size-body);
     color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 3px;
   }
+
+  .stat-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .known-icon { color: var(--success); }
+  .unknown-icon { color: var(--danger); }
 
   .card-area {
     flex: 1;
@@ -478,8 +498,9 @@
   }
 
   .btn-icon {
-    font-size: 18px;
-    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 
   /* Result screen */
@@ -494,7 +515,14 @@
   }
 
   .result-icon {
-    font-size: 48px;
+    width: 56px;
+    height: 56px;
+    color: var(--accent);
+  }
+
+  .result-icon svg {
+    width: 100%;
+    height: 100%;
   }
 
   .review-result h2 {
